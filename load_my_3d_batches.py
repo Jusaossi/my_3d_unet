@@ -45,7 +45,8 @@ def load_my_3d_batch(my_batch):
     if machine == 'DESKTOP-K3R0DFP':
         my_path = r'C:\Users\jpkorpel\Desktop\hammas'
     else:
-        my_path = r'C:\Users\jpkorpel\Desktop\hammas'
+        my_dir = os.getcwd()
+        my_path = os.path.join(my_dir, 'hammas')
 
     patient_images_file = 'X_images_' + patient + '.npy'
     patient_targets_file = 'Y_targets_' + patient + '.npy'
