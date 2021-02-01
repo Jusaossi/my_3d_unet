@@ -5,7 +5,7 @@ import os
 import platform
 import Unet_versions
 import torch.optim as optim
-from load_my_3d_batches import load_my_3d_batch
+from load_my_new_3d_batches import load_my_new_3d_batch
 from collections import OrderedDict
 from runbuilderclass import RunBuilder
 from my_metrics import calculate_my_metrics, calculate_my_sets
@@ -33,18 +33,18 @@ device = torch.device(card)
 manager = RunManager3D()
 runs_count = 0
 np.random.seed(2020)
-number_of_batches = 21
+number_of_batches = 119
 test_batches_number = int(np.floor(number_of_batches / 5))
 ss = np.random.permutation(number_of_batches) + 1
 test_batches = ss[:test_batches_number]
 train_batches = ss[test_batches_number:]
-print(test_batches)
-print(train_batches)
+# print(test_batches)
+# print(train_batches)
 
 for run in RunBuilder.get_runs(params):
     runs_count += 1
     network = getattr(Unet_versions, run.unet)()
-    print(network)
+    # print(network)
 
     loss_function = getattr(my_loss_functions, run.loss)()
     network.to(device=device)
@@ -71,7 +71,7 @@ for run in RunBuilder.get_runs(params):
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
-            images, targets = load_my_3d_batch(batch)
+            images, targets = load_my_new_3d_batch(batch)
             print(images.shape)
 
             images = images.astype(np.float32)
@@ -131,7 +131,7 @@ for run in RunBuilder.get_runs(params):
         epoch_train_recall = epoch_tp / (epoch_tp + epoch_fn)
         epoch_train_precision = epoch_tp / (epoch_tp + epoch_fp)
         epoch_train_f1_score = (2 * epoch_train_precision * epoch_train_recall) / (epoch_train_precision + epoch_train_recall)
-        print('paskaa', epoch_train_recall, epoch_train_precision, epoch_train_f1_score)
+        # print('paskaa', epoch_train_recall, epoch_train_precision, epoch_train_f1_score)
         #manager.track_test_loss(test_epoch_loss, test_count)
         manager.track_train_epoch_metrics(epoch_train_recall, epoch_train_precision, epoch_train_f1_score)
         manager.track_train_loss(epoch_loss, batch_count)
@@ -154,7 +154,7 @@ for run in RunBuilder.get_runs(params):
             print('testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
-            images, targets = load_my_3d_batch(test_batch)
+            images, targets = load_my_new_3d_batch(test_batch)
 
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
