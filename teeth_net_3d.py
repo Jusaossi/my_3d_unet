@@ -71,15 +71,17 @@ for run in RunBuilder.get_runs(params):
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
-            images, targets = load_my_new_3d_batch(batch)
-            print(images.shape)
-
+            images, _ = load_my_new_3d_batch(batch)
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
             images = images.unsqueeze(0)
             images = images.to(device)
 
+            preds = network(images)
+
+            del images
+            _, targets = load_my_new_3d_batch(batch)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
@@ -99,7 +101,7 @@ for run in RunBuilder.get_runs(params):
             # print('images shape=', images.shape)
             # print('targets shape=', targets.shape)
 
-            preds = network(images)
+
 
             # print('images shape=', images.shape)
             # print('targets shape=', targets.shape)
@@ -127,7 +129,7 @@ for run in RunBuilder.get_runs(params):
             epoch_tp += TP
             epoch_fp += FP
             epoch_fn += FN
-            #manager.track_num_correct(recall, precision, f1_score)
+            torch.cuda.empty_cache()
         epoch_train_recall = epoch_tp / (epoch_tp + epoch_fn)
         epoch_train_precision = epoch_tp / (epoch_tp + epoch_fp)
         epoch_train_f1_score = (2 * epoch_train_precision * epoch_train_recall) / (epoch_train_precision + epoch_train_recall)
@@ -192,7 +194,7 @@ for run in RunBuilder.get_runs(params):
 #             #
 #             #         writer = csv.writer(f)
 #             #         writer.writerow(result)
-#
+            torch.cuda.empty_cache()
         epoch_test_recall = test_epoch_tp / (test_epoch_tp + test_epoch_fn)
         epoch_test_precision = test_epoch_tp / (test_epoch_tp + test_epoch_fp)
         epoch_test_f1_score = (2 * epoch_test_precision * epoch_test_recall) / (epoch_test_precision + epoch_test_recall)

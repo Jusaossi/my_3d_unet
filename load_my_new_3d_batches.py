@@ -319,7 +319,7 @@ def load_my_new_3d_batch(batch_nro):
         my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = batch_coordinates[my_batches[batch_nro][1]]
         
     else:
-        print('mulkku')
+        # print('mulkku')
         my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = batch_coordinates2[my_batches[batch_nro][1]]
 
     if machine == 'DESKTOP-K3R0DFP':
