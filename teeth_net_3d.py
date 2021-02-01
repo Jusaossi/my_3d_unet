@@ -33,13 +33,11 @@ device = torch.device(card)
 manager = RunManager3D()
 runs_count = 0
 np.random.seed(2020)
-number_of_batches = 119
+number_of_batches = 63
 test_batches_number = int(np.floor(number_of_batches / 5))
 ss = np.random.permutation(number_of_batches) + 1
 test_batches = ss[:test_batches_number]
 train_batches = ss[test_batches_number:]
-# print(test_batches)
-# print(train_batches)
 
 for run in RunBuilder.get_runs(params):
     runs_count += 1
@@ -64,9 +62,9 @@ for run in RunBuilder.get_runs(params):
         epoch_fp = 0
         epoch_fn = 0
 
-        for batch in test_batches:
+        for batch in train_batches:
             batch_count += 1
-            print('batch nro =', batch_count)
+            print('batch_count=', batch_count, 'batch number =', batch)
             #print('run.batch_size', run.batch_size)
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
@@ -153,7 +151,7 @@ for run in RunBuilder.get_runs(params):
         network.eval()
         for test_batch in test_batches:
             test_count += 1
-            print('testi batch nummero', test_count)
+            print('test_count=', test_count, 'testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
             images, targets = load_my_new_3d_batch(test_batch)
