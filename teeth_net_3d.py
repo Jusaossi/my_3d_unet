@@ -33,7 +33,7 @@ device = torch.device(card)
 manager = RunManager3D()
 runs_count = 0
 np.random.seed(2020)
-number_of_batches = 63
+number_of_batches = 189
 test_batches_number = int(np.floor(number_of_batches / 5))
 ss = np.random.permutation(number_of_batches) + 1
 test_batches = ss[:test_batches_number]
