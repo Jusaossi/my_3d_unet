@@ -5,7 +5,7 @@ import platform
 
 machine = platform.node()
 
-def load_my_new_3d_batch(batch_nro):
+def load_my_new_3d_batch(batch_nro, scale):
     my_batches = {1: ['andy', 'batch_1'], 2: ['andy', 'batch_2'], 3: ['andy', 'batch_3'], 4: ['andy', 'batch_4'],
                   5: ['andy', 'batch_5'], 6: ['andy', 'batch_6'], 7: ['andy', 'batch_7'], 8: ['andy', 'batch_8'],
                   9: ['andy', 'batch_9'], 10: ['andy', 'batch_10'], 11: ['andy', 'batch_11'],
@@ -786,6 +786,27 @@ def load_my_new_3d_batch(batch_nro):
     # exit()
     my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
     my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+    my_images = my_images.astype(np.float32)
+    # print(my_images.shape)
+    # print('max =', np.max(my_images))
+    # print('min =', np.min(my_images))
+    # print(scale)
+    if scale == '[-1,1]':
+        np.clip(my_images, 500, 3500, out=my_images)
+        my_images = my_images - 2000
+        my_images = my_images / 1500
+    elif scale == '[0,1]':
+        np.clip(my_images, 800, 3800, out=my_images)
+        my_images = my_images - 800
+        my_images = my_images / 3000
+    elif scale == 'norm':
+        my_std = np.std(my_images)
+        my_mean = np.mean(my_images)
+        my_images = (my_images - my_mean) / my_std
+    # print('after scaking', my_images.shape)
+    # print('after scaling max =', np.max(my_images))
+    # print('after scaling min =', np.min(my_images))
+    # exit()
     return my_images, my_targets
 #     print(my_images.shape)
 #     print(my_targets.shape)
