@@ -27,7 +27,7 @@ else:
 # -----------------load data----------- for now------before dataloader--------------
 
 epoch_numbers = 30
-params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.001], scale=['[0,1]', 'norm', '[-1,1]'])
+params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.001], scale=['[0,1]'])
 
 device = torch.device(card)
 manager = RunManager3D()

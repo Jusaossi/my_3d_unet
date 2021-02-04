@@ -796,9 +796,22 @@ def load_my_new_3d_batch(batch_nro, scale):
         my_images = my_images - 2000
         my_images = my_images / 1500
     elif scale == '[0,1]':
+        np.clip(my_images, 600, 4000, out=my_images)
+        if patient == 'andy':
+            my_images = my_images + 94
+        elif patient == 'teeth1':
+            my_images = my_images - 162
+        elif patient == 'teeth2':
+            my_images = my_images + 41
+        elif patient == 'patient1':
+            my_images = my_images - 115
+        elif patient == 'timo':
+            my_images = my_images + 132
+
         np.clip(my_images, 800, 3800, out=my_images)
         my_images = my_images - 800
         my_images = my_images / 3000
+
     elif scale == 'norm':
         my_std = np.std(my_images)
         my_mean = np.mean(my_images)
