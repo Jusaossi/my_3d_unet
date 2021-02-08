@@ -5,7 +5,7 @@ import platform
 
 machine = platform.node()
 
-def load_my_new_3d_batch(batch_nro, scale):
+def load_my_new_3d_batch(batch_nro, scale, lower_cut):
     my_batches = {1: ['andy', 'batch_1'], 2: ['andy', 'batch_2'], 3: ['andy', 'batch_3'], 4: ['andy', 'batch_4'],
                   5: ['andy', 'batch_5'], 6: ['andy', 'batch_6'], 7: ['andy', 'batch_7'], 8: ['andy', 'batch_8'],
                   9: ['andy', 'batch_9'], 10: ['andy', 'batch_10'], 11: ['andy', 'batch_11'],
@@ -796,7 +796,6 @@ def load_my_new_3d_batch(batch_nro, scale):
         my_images = my_images - 2000
         my_images = my_images / 1500
     elif scale == '[0,1]':
-        np.clip(my_images, 600, 4000, out=my_images)
         if patient == 'andy':
             my_images = my_images + 94
         elif patient == 'teeth1':
@@ -807,10 +806,9 @@ def load_my_new_3d_batch(batch_nro, scale):
             my_images = my_images - 115
         elif patient == 'timo':
             my_images = my_images + 132
-
-        np.clip(my_images, 800, 3800, out=my_images)
-        my_images = my_images - 800
-        my_images = my_images / 3000
+        np.clip(my_images, lower_cut, 4000, out=my_images)
+        my_images = my_images - lower_cut
+        my_images = my_images / (4000 - lower_cut)
 
     elif scale == 'norm':
         my_std = np.std(my_images)

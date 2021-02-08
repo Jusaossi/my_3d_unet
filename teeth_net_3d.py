@@ -26,8 +26,8 @@ else:
 
 # -----------------load data----------- for now------before dataloader--------------
 
-epoch_numbers = 30
-params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.001], scale=['[0,1]'])
+epoch_numbers = 70
+params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.0001], scale=['[0,1]'], lower_cut=[200])
 
 device = torch.device(card)
 manager = RunManager3D()
@@ -69,7 +69,7 @@ for run in RunBuilder.get_runs(params):
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
-            images, _ = load_my_new_3d_batch(batch, run.scale)
+            images,  targets = load_my_new_3d_batch(batch, run.scale, lower_cut=run.lower_cut)
 
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
@@ -79,7 +79,6 @@ for run in RunBuilder.get_runs(params):
             preds = network(images)
 
             del images
-            _, targets = load_my_new_3d_batch(batch, run.scale)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
@@ -155,8 +154,7 @@ for run in RunBuilder.get_runs(params):
             print('test_count=', test_count, 'testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
-            images, targets = load_my_new_3d_batch(test_batch, run.scale)
-
+            images, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=run.lower_cut)
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
