@@ -154,20 +154,22 @@ for run in RunBuilder.get_runs(params):
             print('test_count=', test_count, 'testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
-            images, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=run.lower_cut)
+            images, _ = load_my_new_3d_batch(test_batch, run.scale, lower_cut=run.lower_cut)
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
             images = images.unsqueeze(0)
             images = images.to(device)
-
+            preds = network(images)
+            del images
+            _, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=run.lower_cut)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
             targets = targets.unsqueeze(0)
             targets = targets.to(device)
 
-            preds = network(images)
+
 
             test_loss = loss_function(preds.detach(), targets.detach())
             test_epoch_loss += test_loss.item()
@@ -191,7 +193,7 @@ for run in RunBuilder.get_runs(params):
 #             #
 #             #         writer = csv.writer(f)
 #             #         writer.writerow(result)
-            del images, targets, preds
+            del targets, preds
             torch.cuda.empty_cache()
         epoch_test_recall = test_epoch_tp / (test_epoch_tp + test_epoch_fn)
         epoch_test_precision = test_epoch_tp / (test_epoch_tp + test_epoch_fp)
