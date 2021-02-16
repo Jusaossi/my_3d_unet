@@ -2,10 +2,13 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import platform
+import random
+from my_3d_albumentations import my_3d_random_crop
 
 machine = platform.node()
 
-def load_my_new_3d_batch(batch_nro, scale, lower_cut):
+
+def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube):
     my_batches = {1: ['andy', 'batch_1'], 2: ['andy', 'batch_2'], 3: ['andy', 'batch_3'], 4: ['andy', 'batch_4'],
                   5: ['andy', 'batch_5'], 6: ['andy', 'batch_6'], 7: ['andy', 'batch_7'], 8: ['andy', 'batch_8'],
                   9: ['andy', 'batch_9'], 10: ['andy', 'batch_10'], 11: ['andy', 'batch_11'],
@@ -102,6 +105,7 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut):
                   }
 
     patient = my_batches[batch_nro][0]
+    # print(patient)
     batch_cut = None
     x_half_length = None
     y_half_length = None
@@ -114,30 +118,41 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut):
     x_quarter_length = 0
     y_quarter_length = 0
 
+    add_x = 0
+    add_x2 = 0
     if patient == 'andy':
         batch_cut = [470, 620, 120, 250, 250, 410]
         x_half_length = int(160 / 2)
         y_half_length = int(130 / 2)
         z_half_length = int(150 / 2)
-        cube_size = 64
+        add_x = 20
+        add_x2 = 10
+        cube_size = 80
     elif patient == 'teeth1':
         batch_cut = [30, 194, 50, 280, 100, 350]
-        x_half_length = int(250 / 2)    # 70 mimimi
-        y_half_length = int(230 / 2)   # 77 minimi
+        x_half_length = int(250 / 2)  # 70 mimimi
+        y_half_length = int(230 / 2)  # 77 minimi
         z_half_length = int(164 / 2)
         cube_size = 96
+        add_x = 20
+        add_x2 = 10
     elif patient == 'teeth2':
         batch_cut = [150, 306, 20, 210, 150, 390]
         x_half_length = int(240 / 2)  # 66,66 minimi
         y_half_length = int(190 / 2)  # 63,33
         z_half_length = int(156 / 2)
         cube_size = 88
+        add_x = 20
+        add_x2 = 10
     elif patient == 'timo':
         batch_cut = [440, 600, 80, 230, 240, 440]
         x_half_length = int(200 / 2)  # 66,66 minimi
         y_half_length = int(150 / 2)  # 63,33
         z_half_length = int(160 / 2)
-        cube_size = 72
+        cube_size = 80
+        add_x = 20
+        add_x2 = 10
+
     elif patient == 'patient1':
         batch_cut = [40, 420, 26, 410, 30, 520]
         my_move = 80
@@ -148,8 +163,8 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut):
         y_quarter_length = int((410 - 26) / 4)  # 63,33
         z_half_length = int(380 / 2)
         z_quarter_length = int(380 / 4)
-        cube_size = 104
-        cube_size_z = 80
+        cube_size = 96
+        cube_size_z = 96
 
     #print(patient, cube_size)
     # print(my_batches[batch_nro][1])
@@ -164,61 +179,77 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut):
     batch_coordinates = {
         'batch_1': [batch_cut[0], batch_cut[0] + cube_size,
                     batch_cut[2], batch_cut[2] + cube_size,
-                    batch_cut[4] + 30, batch_cut[4] + 30 + cube_size],
+                    batch_cut[4] + add_x, batch_cut[4] + add_x + cube_size],
         'batch_2': [batch_cut[0], batch_cut[0] + cube_size,
                     batch_cut[2], batch_cut[2] + cube_size,
-                    batch_cut[4] + x_half_length - int(cube_size / 2), batch_cut[4] + x_half_length + int(cube_size / 2)],
+                    batch_cut[4] + x_half_length - int(cube_size / 2),
+                    batch_cut[4] + x_half_length + int(cube_size / 2)],
         'batch_3': [batch_cut[0], batch_cut[0] + cube_size,
                     batch_cut[2], batch_cut[2] + cube_size,
-                    batch_cut[5] - 30 - cube_size, batch_cut[5] - 30],
+                    batch_cut[5] - add_x - cube_size, batch_cut[5] - add_x],
         'batch_4': [batch_cut[0], batch_cut[0] + cube_size,
-                    batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                    batch_cut[4] + 15, batch_cut[4] + 15 + cube_size],
+                    batch_cut[2] + y_half_length - int(cube_size / 2),
+                    batch_cut[2] + y_half_length + int(cube_size / 2),
+                    batch_cut[4] + add_x2, batch_cut[4] + add_x2 + cube_size],
         'batch_5': [batch_cut[0], batch_cut[0] + cube_size,
-                    batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                    batch_cut[5] - 15 - cube_size, batch_cut[5] - 15],
+                    batch_cut[2] + y_half_length - int(cube_size / 2),
+                    batch_cut[2] + y_half_length + int(cube_size / 2),
+                    batch_cut[5] - add_x2 - cube_size, batch_cut[5] - add_x2],
         'batch_6': [batch_cut[0], batch_cut[0] + cube_size,
                     batch_cut[3] - cube_size, batch_cut[3],
                     batch_cut[4], batch_cut[4] + cube_size],
         'batch_7': [batch_cut[0], batch_cut[0] + cube_size,
                     batch_cut[3] - cube_size, batch_cut[3],
                     batch_cut[5] - cube_size, batch_cut[5]],
-        'batch_8': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
+        'batch_8': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                    batch_cut[0] + z_half_length + int(cube_size / 2),
                     batch_cut[2], batch_cut[2] + cube_size,
-                    batch_cut[4] + 30, batch_cut[4] + 30 + cube_size],
-        'batch_9': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
+                    batch_cut[4] + add_x, batch_cut[4] + add_x + cube_size],
+        'batch_9': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                    batch_cut[0] + z_half_length + int(cube_size / 2),
                     batch_cut[2], batch_cut[2] + cube_size,
-                    batch_cut[4] + x_half_length - int(cube_size / 2), batch_cut[4] + x_half_length + int(cube_size / 2)],
-        'batch_10': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
+                    batch_cut[4] + x_half_length - int(cube_size / 2),
+                    batch_cut[4] + x_half_length + int(cube_size / 2)],
+        'batch_10': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                     batch_cut[0] + z_half_length + int(cube_size / 2),
                      batch_cut[2], batch_cut[2] + cube_size,
-                     batch_cut[5] - 30 - cube_size, batch_cut[5] - 30],
-        'batch_11': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
-                     batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                     batch_cut[4] + 15, batch_cut[4] + 15 + cube_size],
-        'batch_12': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
-                     batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                     batch_cut[5] - 15 - cube_size, batch_cut[5] - 15],
-        'batch_13': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
-                     batch_cut[3] - cube_size,  batch_cut[3],
+                     batch_cut[5] - add_x - cube_size, batch_cut[5] - add_x],
+        'batch_11': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                     batch_cut[0] + z_half_length + int(cube_size / 2),
+                     batch_cut[2] + y_half_length - int(cube_size / 2),
+                     batch_cut[2] + y_half_length + int(cube_size / 2),
+                     batch_cut[4] + add_x2, batch_cut[4] + add_x2 + cube_size],
+        'batch_12': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                     batch_cut[0] + z_half_length + int(cube_size / 2),
+                     batch_cut[2] + y_half_length - int(cube_size / 2),
+                     batch_cut[2] + y_half_length + int(cube_size / 2),
+                     batch_cut[5] - add_x2 - cube_size, batch_cut[5] - add_x2],
+        'batch_13': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                     batch_cut[0] + z_half_length + int(cube_size / 2),
+                     batch_cut[3] - cube_size, batch_cut[3],
                      batch_cut[4], batch_cut[4] + cube_size],
-        'batch_14': [batch_cut[0] + z_half_length - int(cube_size / 2), batch_cut[0] + z_half_length + int(cube_size / 2),
+        'batch_14': [batch_cut[0] + z_half_length - int(cube_size / 2),
+                     batch_cut[0] + z_half_length + int(cube_size / 2),
                      batch_cut[3] - cube_size, batch_cut[3],
                      batch_cut[5] - cube_size, batch_cut[5]],
         'batch_15': [batch_cut[1] - cube_size, batch_cut[1],
                      batch_cut[2], batch_cut[2] + cube_size,
-                     batch_cut[4] + 30, batch_cut[4] + 30 + cube_size],
+                     batch_cut[4] + add_x, batch_cut[4] + add_x + cube_size],
         'batch_16': [batch_cut[1] - cube_size, batch_cut[1],
                      batch_cut[2], batch_cut[2] + cube_size,
-                     batch_cut[4] + x_half_length - int(cube_size / 2), batch_cut[4] + x_half_length + int(cube_size / 2)],
+                     batch_cut[4] + x_half_length - int(cube_size / 2),
+                     batch_cut[4] + x_half_length + int(cube_size / 2)],
         'batch_17': [batch_cut[1] - cube_size, batch_cut[1],
                      batch_cut[2], batch_cut[2] + cube_size,
-                     batch_cut[5] - 30 - cube_size, batch_cut[5] - 30],
+                     batch_cut[5] - add_x - cube_size, batch_cut[5] - add_x],
         'batch_18': [batch_cut[1] - cube_size, batch_cut[1],
-                     batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                     batch_cut[4] + 15, batch_cut[4] + 15 + cube_size],
+                     batch_cut[2] + y_half_length - int(cube_size / 2),
+                     batch_cut[2] + y_half_length + int(cube_size / 2),
+                     batch_cut[4] + add_x2, batch_cut[4] + add_x2 + cube_size],
         'batch_19': [batch_cut[1] - cube_size, batch_cut[1],
-                     batch_cut[2] + y_half_length - int(cube_size / 2), batch_cut[2] + y_half_length + int(cube_size / 2),
-                     batch_cut[5] - 15 - cube_size, batch_cut[5] - 15],
+                     batch_cut[2] + y_half_length - int(cube_size / 2),
+                     batch_cut[2] + y_half_length + int(cube_size / 2),
+                     batch_cut[5] - add_x2 - cube_size, batch_cut[5] - add_x2],
         'batch_20': [batch_cut[1] - cube_size, batch_cut[1],
                      batch_cut[3] - cube_size, batch_cut[3],
                      batch_cut[4], batch_cut[4] + cube_size],
@@ -784,9 +815,21 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut):
     #
     # plt.show()
     # exit()
-    my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
-    my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
-    my_images = my_images.astype(np.float32)
+    my_crop = random.choices(['True', 'False'], weights=(99, 1), k=1)[0]
+    #print(my_crop)
+    if crop_cube != 'False' and my_crop == 'True':
+        crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6, crop_cube)
+        my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+        my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+        my_images = my_images.astype(np.float32)
+        #print('shape of my images =', my_images.shape)
+    else:
+        #print('no_crop')
+        my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+        my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+        my_images = my_images.astype(np.float32)
+        #print('shape of my images =', my_images.shape)
+
     # print(my_images.shape)
     # print('max =', np.max(my_images))
     # print('min =', np.min(my_images))

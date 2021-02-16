@@ -27,7 +27,7 @@ else:
 # -----------------load data----------- for now------before dataloader--------------
 
 epoch_numbers = 70
-params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.0001], scale=['[0,1]'], lower_cut=[200])
+params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.0001], scale=['[0,1]'], crop_cube=[64])
 
 device = torch.device(card)
 manager = RunManager3D()
@@ -64,12 +64,12 @@ for run in RunBuilder.get_runs(params):
 
         for batch in train_batches:
             batch_count += 1
-            print('batch_count=', batch_count, 'batch number =', batch)
+            # print('batch_count=', batch_count, 'batch number =', batch)
             #print('run.batch_size', run.batch_size)
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
-            images,  _ = load_my_new_3d_batch(batch, run.scale, lower_cut=run.lower_cut)
+            images,  targets = load_my_new_3d_batch(batch, run.scale, lower_cut=200, crop_cube=run.crop_cube)
 
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
@@ -79,7 +79,7 @@ for run in RunBuilder.get_runs(params):
             preds = network(images)
             del images
 
-            _, targets = load_my_new_3d_batch(batch, run.scale, lower_cut=run.lower_cut)
+            # _, targets = load_my_new_3d_batch(batch, run.scale, lower_cut=200, crop_cube=run.crop_cube)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
@@ -108,9 +108,9 @@ for run in RunBuilder.get_runs(params):
             #if run.loss == 'MyDiceLoss':
             loss = loss_function(preds, targets)
 
-            print(loss)
+            #print(loss)
             batch_loss = loss.detach().item()
-            print(batch_loss)
+            #print(batch_loss)
             #manager.track_loss(batch_loss)
             epoch_loss += batch_loss
             # average_epoch_loss = epoch_loss / batch_count
@@ -151,10 +151,10 @@ for run in RunBuilder.get_runs(params):
         network.eval()
         for test_batch in test_batches:
             test_count += 1
-            print('test_count=', test_count, 'testi batch nummero', test_count)
+            #print('test_count=', test_count, 'testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
-            images, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=run.lower_cut)
+            images, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=200, crop_cube='False')
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
@@ -201,12 +201,12 @@ for run in RunBuilder.get_runs(params):
         # manager.track_test_num_correct(t_epoch_recall, t_epoch_precision, t_epoch_f1_score)
         manager.track_test_true_epoch_metrics(epoch_test_recall, epoch_test_precision, epoch_test_f1_score)
 
-        if epoch_test_f1_score > my_f1_score:
-            my_f1_score = epoch_test_f1_score
-            print('model now save, epoch =', epoch)
-            print('epoch_test_f1_score:', epoch_test_f1_score)
-            torch.save(network, my_save_path + '\\' + '3d_network_70_epoch_own_scale_200_clamp.pth')
-        # scheduler.step()
+        # if epoch_test_f1_score > my_f1_score:
+        #     my_f1_score = epoch_test_f1_score
+        #     print('model now save, epoch =', epoch)
+        #     print('epoch_test_f1_score:', epoch_test_f1_score)
+        #     torch.save(network, my_save_path + '\\' + '3d_network_70_epoch_own_scale_200_clamp.pth')
+        # # scheduler.step()
         manager.end_epoch()
         torch.cuda.empty_cache()
     manager.end_run()
