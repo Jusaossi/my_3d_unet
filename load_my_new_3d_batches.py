@@ -8,7 +8,7 @@ from my_3d_albumentations import my_3d_random_crop
 machine = platform.node()
 
 
-def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube):
+def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube, crop_strategy):
     my_batches = {1: ['andy', 'batch_1'], 2: ['andy', 'batch_2'], 3: ['andy', 'batch_3'], 4: ['andy', 'batch_4'],
                   5: ['andy', 'batch_5'], 6: ['andy', 'batch_6'], 7: ['andy', 'batch_7'], 8: ['andy', 'batch_8'],
                   9: ['andy', 'batch_9'], 10: ['andy', 'batch_10'], 11: ['andy', 'batch_11'],
@@ -815,20 +815,32 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube):
     #
     # plt.show()
     # exit()
-    my_crop = random.choices(['True', 'False'], weights=(99, 1), k=1)[0]
-    #print(my_crop)
+    my_crop = random.choices(['True', 'False'], weights=(30, 70), k=1)[0]
+    # print('is crop=', my_crop)
     if crop_cube != 'False' and my_crop == 'True':
-        crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6, crop_cube)
-        my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
-        my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
-        my_images = my_images.astype(np.float32)
-        #print('shape of my images =', my_images.shape)
+        if crop_strategy == 'random_small':
+            crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6, crop_cube)
+            my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_images = my_images.astype(np.float32)
+        elif crop_strategy == 'random_same':
+            crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(batch_cut[0], batch_cut[1], batch_cut[2], batch_cut[3], batch_cut[4], batch_cut[5], cube_size)
+            my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_images = my_images.astype(np.float32)
+        # print('shape of my images =', my_images.shape)
+        # print('crop_strategy=', crop_strategy)
+        # print('cube size=', cube_size)
+        # print('my_sliceri=', my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6)
+        # print('my cube=', crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6)
+        # print('my dicom=', batch_cut)
+
     else:
-        #print('no_crop')
+        # print('no_crop')
         my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
         my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
         my_images = my_images.astype(np.float32)
-        #print('shape of my images =', my_images.shape)
+        # print('shape of my images =', my_images.shape)
 
     # print(my_images.shape)
     # print('max =', np.max(my_images))
