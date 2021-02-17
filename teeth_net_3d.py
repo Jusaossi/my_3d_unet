@@ -5,7 +5,7 @@ import os
 import platform
 import Unet_versions
 import torch.optim as optim
-from load_my_new_3d_batches import load_my_new_3d_batch
+from load_my_new_3d_batches import load_my_new_3d_batch, load_my_target
 from collections import OrderedDict
 from runbuilderclass import RunBuilder
 from my_metrics import calculate_my_metrics, calculate_my_sets
@@ -69,17 +69,17 @@ for run in RunBuilder.get_runs(params):
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
-            images,  targets = load_my_new_3d_batch(batch, run.scale, lower_cut=200, crop_cube=run.crop_cube, crop_strategy=run.crop_strategy)
+            images, target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = \
+                load_my_new_3d_batch(batch, run.scale, lower_cut=200, crop_cube=run.crop_cube, crop_strategy=run.crop_strategy)
 
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
             images = images.unsqueeze(0)
             images = images.to(device)
-
             preds = network(images)
             del images
 
-            # _, targets = load_my_new_3d_batch(batch, run.scale, lower_cut=200, crop_cube=run.crop_cube)
+            targets = load_my_target(target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
@@ -128,6 +128,7 @@ for run in RunBuilder.get_runs(params):
             epoch_fp += FP
             epoch_fn += FN
             torch.cuda.empty_cache()
+            del targets
         epoch_train_recall = epoch_tp / (epoch_tp + epoch_fn)
         epoch_train_precision = epoch_tp / (epoch_tp + epoch_fp)
         epoch_train_f1_score = (2 * epoch_train_precision * epoch_train_recall) / (epoch_train_precision + epoch_train_recall)
@@ -154,7 +155,8 @@ for run in RunBuilder.get_runs(params):
             #print('test_count=', test_count, 'testi batch nummero', test_count)
             if test_count == 3 and machine == 'DESKTOP-K3R0DFP':
                 break
-            images, targets = load_my_new_3d_batch(test_batch, run.scale, lower_cut=200, crop_cube='False', crop_strategy=run.crop_strategy)
+            images, target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = \
+                load_my_new_3d_batch(test_batch, run.scale, lower_cut=200, crop_cube='False', crop_strategy=run.crop_strategy)
             images = images.astype(np.float32)
             images = torch.as_tensor(images)
             images = images.unsqueeze(0)
@@ -162,7 +164,9 @@ for run in RunBuilder.get_runs(params):
             images = images.to(device)
 
             preds = network(images)
-
+            del images
+            targets = load_my_target(target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5,
+                                     my_slicer6)
             targets = targets.astype(np.float32)
             targets = torch.as_tensor(targets)
             targets = targets.unsqueeze(0)
@@ -192,6 +196,7 @@ for run in RunBuilder.get_runs(params):
 #             #         writer = csv.writer(f)
 #             #         writer.writerow(result)
             torch.cuda.empty_cache()
+            del targets
         epoch_test_recall = test_epoch_tp / (test_epoch_tp + test_epoch_fn)
         epoch_test_precision = test_epoch_tp / (test_epoch_tp + test_epoch_fp)
         epoch_test_f1_score = (2 * epoch_test_precision * epoch_test_recall) / (epoch_test_precision + epoch_test_recall)

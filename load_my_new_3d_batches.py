@@ -800,6 +800,7 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube, crop_strategy):
     image_folder = os.path.join(my_path, patient, patient_images_file)
     #print(image_folder)
     target_folder = os.path.join(my_path, patient, patient_targets_file)
+    my_images = None
 
     # plt.figure(11)
     # for j in range(5):
@@ -819,28 +820,28 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube, crop_strategy):
     # print('is crop=', my_crop)
     if crop_cube != 'False' and my_crop == 'True':
         if crop_strategy == 'random_small':
-            crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6, crop_cube)
-            my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
-            my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = my_3d_random_crop(my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6, crop_cube)
+            my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+            # my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
             my_images = my_images.astype(np.float32)
         elif crop_strategy == 'random_same':
-            crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6 = my_3d_random_crop(batch_cut[0], batch_cut[1], batch_cut[2], batch_cut[3], batch_cut[4], batch_cut[5], cube_size)
-            my_images = np.load(image_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
-            my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
+            my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6 = my_3d_random_crop(batch_cut[0], batch_cut[1], batch_cut[2], batch_cut[3], batch_cut[4], batch_cut[5], cube_size)
+            my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+            # my_targets = np.load(target_folder)[crop_slicer1: crop_slicer2, crop_slicer3: crop_slicer4, crop_slicer5: crop_slicer6]
             my_images = my_images.astype(np.float32)
         # print('shape of my images =', my_images.shape)
         # print('crop_strategy=', crop_strategy)
         # print('cube size=', cube_size)
         # print('my_sliceri=', my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6)
-        # print('my cube=', crop_slicer1, crop_slicer2, crop_slicer3, crop_slicer4, crop_slicer5, crop_slicer6)
+        #
         # print('my dicom=', batch_cut)
 
     else:
         # print('no_crop')
         my_images = np.load(image_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
-        my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
         my_images = my_images.astype(np.float32)
         # print('shape of my images =', my_images.shape)
+        # print('my_sliceri=', my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6)
 
     # print(my_images.shape)
     # print('max =', np.max(my_images))
@@ -873,36 +874,10 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube, crop_strategy):
     # print('after scaling max =', np.max(my_images))
     # print('after scaling min =', np.min(my_images))
     # exit()
-    return my_images, my_targets
-#     print(my_images.shape)
-#     print(my_targets.shape)
-#     s = 40
-#     print('my j', j)
-#
-#     if j in [1, 2, 3]:
-#         plt.subplot(3, 6, j)
-#         plt.imshow(my_images[s])
-#         plt.subplot(3, 6, j + 3)
-#         plt.imshow(my_targets[s])
-#     elif j == 4:
-#         plt.subplot(3, 6, j + 3)
-#         plt.imshow(my_images[s])
-#         plt.subplot(3, 6, j + 6)
-#         plt.imshow(my_targets[s])
-#     elif j == 5:
-#         plt.subplot(3, 6, j + 4)
-#         plt.imshow(my_images[s])
-#         plt.subplot(3, 6, j + 7)
-#         plt.imshow(my_targets[s])
-#     elif j == 6:
-#         plt.subplot(3, 6, j + 7)
-#         plt.imshow(my_images[s])
-#         plt.subplot(3, 6, j + 10)
-#         plt.imshow(my_targets[s])
-#     else:
-#         plt.subplot(3, 6, j + 8)
-#         plt.imshow(my_images[s])
-#         plt.subplot(3, 6, j + 11)
-#         plt.imshow(my_targets[s])
-# plt.show()
-# exit()
+    return my_images, target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6
+
+
+def load_my_target(target_folder, my_slicer1, my_slicer2, my_slicer3, my_slicer4, my_slicer5, my_slicer6):
+    my_targets = np.load(target_folder)[my_slicer1: my_slicer2, my_slicer3: my_slicer4, my_slicer5: my_slicer6]
+    # print('shape of my targets =', my_targets.shape)
+    return my_targets
