@@ -41,10 +41,10 @@ class RunManager3D:
         self.batch_size = None
         self.tb = None
 
-    def begin_run(self, run):       # first method of the class
+    def begin_run(self, run, epoch):       # first method of the class
         self.run_start_time = time.time()
         self.run_params = run
-
+        self.epoch_count = epoch
         self.run_count += 1
         # print(f'run nro = {self.run_count}')
         #self.train_batch_list = train_batch_list

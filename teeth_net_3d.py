@@ -12,6 +12,23 @@ from my_metrics import calculate_my_metrics, calculate_my_sets
 import my_loss_functions
 from Runmanagerclass import RunManager3D
 
+
+def save_checkpoint(state, filename='my_checkpoint.pth.tar'):
+    print('=> Saving checkpoint')
+    torch.save(state, filename)
+
+def load_checkpoint(file):
+    global my_epoch
+    global my_f1_score
+    print('=> Loading checkpoint')
+    my_checkpoint = torch.load(file)
+    network.load_state_dict(my_checkpoint['state_dict'])
+    optimizer.load_state_dict(my_checkpoint['optimizer'])
+    my_epoch = my_checkpoint['Epoch']
+    my_f1_score = my_checkpoint['F1_score']
+
+
+load_model = False
 machine = platform.node()
 # my_data_dir = None
 if machine == 'DESKTOP-K3R0DFP':
@@ -24,10 +41,10 @@ else:
     my_save_path = os.path.join(my_parent_dir, 'my_3d_unet')
     card = 'cuda'
 
-# -----------------load data----------- for now------before dataloader--------------
+# -----------------load data----------- for now------before dataloader--------------, 'random_small'
 
-epoch_numbers = 70
-params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.00008], scale=['[0,1]'], crop_cube=[64], crop_strategy=['random_same', 'random_small'])
+epoch_numbers = 150
+params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.00008], scale=['[0,1]'], crop_cube=[64], crop_strategy=['random_same'])
 
 device = torch.device(card)
 manager = RunManager3D()
@@ -42,17 +59,20 @@ train_batches = ss[test_batches_number:]
 for run in RunBuilder.get_runs(params):
     runs_count += 1
     network = getattr(Unet_versions, run.unet)()
-    # print(network)
+    print(network)
 
     loss_function = getattr(my_loss_functions, run.loss)()
     network.to(device=device)
 
     optimizer = optim.Adam(network.parameters(), lr=run.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
-
-    manager.begin_run(run)
-    my_f1_max_score = 0
+    my_epoch = 0
     my_f1_score = 0
-    for epoch in range(1, epoch_numbers + 1):
+    if load_model:
+        load_checkpoint('my_checkpoint.pth.tar')
+    manager.begin_run(run, my_epoch)
+    # my_f1_max_score = 0
+
+    for epoch in range(my_epoch + 1, epoch_numbers + my_epoch + 1):
         network.train()
         print(f'run = {runs_count}, epoch = {epoch}')
         manager.begin_epoch()
@@ -197,6 +217,7 @@ for run in RunBuilder.get_runs(params):
 #             #         writer.writerow(result)
             torch.cuda.empty_cache()
             del targets
+
         epoch_test_recall = test_epoch_tp / (test_epoch_tp + test_epoch_fn)
         epoch_test_precision = test_epoch_tp / (test_epoch_tp + test_epoch_fp)
         epoch_test_f1_score = (2 * epoch_test_precision * epoch_test_recall) / (epoch_test_precision + epoch_test_recall)
@@ -206,14 +227,18 @@ for run in RunBuilder.get_runs(params):
         # manager.track_test_num_correct(t_epoch_recall, t_epoch_precision, t_epoch_f1_score)
         manager.track_test_true_epoch_metrics(epoch_test_recall, epoch_test_precision, epoch_test_f1_score)
 
-        # if epoch_test_f1_score > my_f1_score:
-        #     my_f1_score = epoch_test_f1_score
-        #     print('model now save, epoch =', epoch)
-        #     print('epoch_test_f1_score:', epoch_test_f1_score)
-        #     torch.save(network, my_save_path + '\\' + '3d_network_70_epoch_own_scale_200_clamp.pth')
-        # # scheduler.step()
+        if epoch_test_f1_score > my_f1_score:
+            my_f1_score = epoch_test_f1_score
+            print('model now save, epoch =', epoch)
+            print('epoch_test_f1_score:', epoch_test_f1_score)
+            torch.save(network, my_save_path + '\\' + '3d_network_150_epoch_own_scale_200_clamp_and_crop.pth')
+        # scheduler.step()
+        if epoch % 5 == 0:
+            checkpoint = {'state_dict': network.state_dict(), 'optimizer': optimizer.state_dict(), 'Epoch': epoch, 'F1_score': my_f1_score}
+            save_checkpoint(checkpoint)
         manager.end_epoch()
         torch.cuda.empty_cache()
+
     manager.end_run()
 # # manager.save(save_file)
 #
