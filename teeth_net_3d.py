@@ -41,10 +41,10 @@ else:
     my_save_path = os.path.join(my_parent_dir, 'my_3d_unet')
     card = 'cuda'
 
-# -----------------load data----------- for now------before dataloader--------------, 'random_small'
+# -----------------load data----------- for now------before dataloader--------------, 'random_small' 'random_same'
 
 epoch_numbers = 150
-params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.00008], scale=['[0,1]'], crop_cube=[64], crop_strategy=['random_same'])
+params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.00008], scale=['[0,1]'], crop_cube=[64], crop_strategy=['no_crop'])
 
 device = torch.device(card)
 manager = RunManager3D()
@@ -59,7 +59,7 @@ train_batches = ss[test_batches_number:]
 for run in RunBuilder.get_runs(params):
     runs_count += 1
     network = getattr(Unet_versions, run.unet)()
-    print(network)
+    #print(network)
 
     loss_function = getattr(my_loss_functions, run.loss)()
     network.to(device=device)
@@ -231,7 +231,7 @@ for run in RunBuilder.get_runs(params):
             my_f1_score = epoch_test_f1_score
             print('model now save, epoch =', epoch)
             print('epoch_test_f1_score:', epoch_test_f1_score)
-            torch.save(network, my_save_path + '\\' + '3d_network_150_epoch_own_scale_200_clamp_and_crop.pth')
+            torch.save(network, my_save_path + '\\' + '3d_network_260_epoch_own_scale_200_clamp.pth')
         # scheduler.step()
         if epoch % 5 == 0:
             checkpoint = {'state_dict': network.state_dict(), 'optimizer': optimizer.state_dict(), 'Epoch': epoch, 'F1_score': my_f1_score}

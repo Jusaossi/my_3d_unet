@@ -816,7 +816,7 @@ def load_my_new_3d_batch(batch_nro, scale, lower_cut, crop_cube, crop_strategy):
     #
     # plt.show()
     # exit()
-    my_crop = random.choices(['True', 'False'], weights=(30, 70), k=1)[0]
+    my_crop = random.choices(['True', 'False'], weights=(0, 100), k=1)[0]
     # print('is crop=', my_crop)
     if crop_cube != 'False' and my_crop == 'True':
         if crop_strategy == 'random_small':
