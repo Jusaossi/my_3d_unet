@@ -5,8 +5,8 @@ import platform
 
 machine = platform.node()
 
-for j in range(1, 22):
-    batch_nro = j + 126
+for j in range(1, 8):
+    batch_nro = j + 231 # 196
     print('batsi nro=', batch_nro)
     my_batches = {1: ['andy', 'batch_1'], 2: ['andy', 'batch_2'], 3: ['andy', 'batch_3'], 4: ['andy', 'batch_4'],
                   5: ['andy', 'batch_5'], 6: ['andy', 'batch_6'], 7: ['andy', 'batch_7'], 8: ['andy', 'batch_8'],
@@ -101,6 +101,39 @@ for j in range(1, 22):
                   185: ['timo', 'batch_17'], 186: ['timo', 'batch_18'], 187: ['timo', 'batch_19'],
                   188: ['timo', 'batch_20'],
                   189: ['timo', 'batch_21'],
+                  190: ['S0157', 'batch_1'], 191: ['S0157', 'batch_2'], 192: ['S0157', 'batch_3'],
+                  193: ['S0157', 'batch_4'],
+                  194: ['S0157', 'batch_5'], 195: ['S0157', 'batch_6'], 196: ['S0157', 'batch_7'],
+                  197: ['S0157', 'batch_8'],
+                  198: ['S0157', 'batch_9'], 199: ['S0157', 'batch_10'], 200: ['S0157', 'batch_11'],
+                  201: ['S0157', 'batch_12'],
+                  202: ['S0157', 'batch_13'], 203: ['S0157', 'batch_14'], 204: ['S0157', 'batch_15'],
+                  205: ['S0157', 'batch_16'],
+                  206: ['S0157', 'batch_17'], 207: ['S0157', 'batch_18'], 208: ['S0157', 'batch_19'],
+                  209: ['S0157', 'batch_20'],
+                  210: ['S0157', 'batch_21'],
+                  211: ['S0406_1', 'batch_1'], 212: ['S0406_1', 'batch_2'], 213: ['S0406_1', 'batch_3'],
+                  214: ['S0406_1', 'batch_4'],
+                  215: ['S0406_1', 'batch_5'], 216: ['S0406_1', 'batch_6'], 217: ['S0406_1', 'batch_7'],
+                  218: ['S0406_1', 'batch_8'],
+                  219: ['S0406_1', 'batch_9'], 220: ['S0406_1', 'batch_10'], 221: ['S0406_1', 'batch_11'],
+                  222: ['S0406_1', 'batch_12'],
+                  223: ['S0406_1', 'batch_13'], 224: ['S0406_1', 'batch_14'], 225: ['S0406_1', 'batch_15'],
+                  226: ['S0406_1', 'batch_16'],
+                  227: ['S0406_1', 'batch_17'], 228: ['S0406_1', 'batch_18'], 229: ['S0406_1', 'batch_19'],
+                  230: ['S0406_1', 'batch_20'],
+                  231: ['S0406_1', 'batch_21'],
+                  232: ['visoerkki', 'batch_1'], 233: ['visoerkki', 'batch_2'], 234: ['visoerkki', 'batch_3'],
+                  235: ['visoerkki', 'batch_4'],
+                  236: ['visoerkki', 'batch_5'], 237: ['visoerkki', 'batch_6'], 238: ['visoerkki', 'batch_7'],
+                  239: ['visoerkki', 'batch_8'],
+                  240: ['visoerkki', 'batch_9'], 241: ['visoerkki', 'batch_10'], 242: ['visoerkki', 'batch_11'],
+                  243: ['visoerkki', 'batch_12'],
+                  244: ['visoerkki', 'batch_13'], 245: ['visoerkki', 'batch_14'], 246: ['visoerkki', 'batch_15'],
+                  247: ['visoerkki', 'batch_16'],
+                  248: ['visoerkki', 'batch_17'], 249: ['visoerkki', 'batch_18'], 250: ['visoerkki', 'batch_19'],
+                  251: ['visoerkki', 'batch_20'],
+                  252: ['visoerkki', 'batch_21']
                   }
 
     patient = my_batches[batch_nro][0]
@@ -123,9 +156,9 @@ for j in range(1, 22):
         x_half_length = int(160 / 2)
         y_half_length = int(130 / 2)
         z_half_length = int(150 / 2)
-        add_x = 20
-        add_x2 = 10
-        cube_size = 80
+        add_x = 10
+        add_x2 = 5
+        cube_size = 96
     elif patient == 'teeth1':
         batch_cut = [30, 194, 50, 280, 100, 350]
         x_half_length = int(250 / 2)  # 70 mimimi
@@ -139,7 +172,7 @@ for j in range(1, 22):
         x_half_length = int(240 / 2)  # 66,66 minimi
         y_half_length = int(190 / 2)  # 63,33
         z_half_length = int(156 / 2)
-        cube_size = 88
+        cube_size = 96
         add_x = 20
         add_x2 = 10
     elif patient == 'timo':
@@ -147,7 +180,7 @@ for j in range(1, 22):
         x_half_length = int(200 / 2)  # 66,66 minimi
         y_half_length = int(150 / 2)  # 63,33
         z_half_length = int(160 / 2)
-        cube_size = 80
+        cube_size = 96
         add_x = 20
         add_x2 = 10
 
@@ -165,6 +198,32 @@ for j in range(1, 22):
         cube_size_z = 96
         print(y_quarter_length, y_half_length)
 
+    elif patient == 'S0157':
+        batch_cut = [0, 150, 0, 160, 0, 180]
+        x_half_length = int(180 / 2)  # 66,66 minimi
+        y_half_length = int(160 / 2)  # 63,33
+        z_half_length = int(150 / 2)
+        cube_size = 96
+        add_x = 10
+        add_x2 = 5
+
+    elif patient == 'S0406_1':
+        batch_cut = [0, 240, 0, 240, 0, 300]
+        x_half_length = int(300 / 2)  # 66,66 minimi
+        y_half_length = int(240 / 2)  # 63,33
+        z_half_length = int(240 / 2)
+        cube_size = 96
+        add_x = 50
+        add_x2 = 25
+
+    elif patient == 'visoerkki':
+        batch_cut = [0, 130, 0, 190, 0, 240]
+        x_half_length = int(240 / 2)  # 66,66 minimi
+        y_half_length = int(190 / 2)  # 63,33
+        z_half_length = int(130 / 2)
+        cube_size = 96
+        add_x = 10
+        add_x2 = 5
     # print(patient, cube_size)
     # print(my_batches[batch_nro][1])
 
@@ -822,7 +881,7 @@ for j in range(1, 22):
 
     print(my_images.shape)
     print(my_targets.shape)
-    s = 40
+    s = 30
     print('my j', j)
 
     if j in [1, 2, 3, 4, 5]:

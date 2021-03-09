@@ -53,8 +53,9 @@ np.random.seed(2020)
 number_of_batches = 189
 test_batches_number = int(np.floor(number_of_batches / 5))
 ss = np.random.permutation(number_of_batches) + 1
-test_batches = ss[:test_batches_number]
+#test_batches = ss[:test_batches_number]
 train_batches = ss[test_batches_number:]
+test_batches = range(190, 211)  # (211, 232)  tai (232, 253)  .. uusille seteille
 
 for run in RunBuilder.get_runs(params):
     runs_count += 1
@@ -85,7 +86,7 @@ for run in RunBuilder.get_runs(params):
         for batch in train_batches:
             batch_count += 1
             # print('batch_count=', batch_count, 'batch number =', batch)
-            #print('run.batch_size', run.batch_size)
+            # print('run.batch_size', run.batch_size)
             if batch_count == 5 and machine == 'DESKTOP-K3R0DFP':
                 break
 
@@ -106,43 +107,17 @@ for run in RunBuilder.get_runs(params):
             targets = targets.unsqueeze(0)
             targets = targets.to(device)
 
-
-            # print('images shape=', images.shape)
-            # print('targets shape=', targets.shape)
-            # if run.albu:
-            #     images, targets = my_data_albumentations(images, targets, run.albu_prob)
-            #     #print('albu megessä')
-            # if run.albu != 'no_augmentation':
-            # images, targets = my_data_albumentations2(images, targets, run.albu, run.albu_prob)
-
-            # images, targets = my_data_albumentations3(images, targets, run.albu, run.albu_prob)
-            # print('images shape=', images.shape)
-            # print('targets shape=', targets.shape)
-
-
-
-            # print('images shape=', images.shape)
-            # print('targets shape=', targets.shape)
-            # print(run.alpha)
-
-            #if run.loss == 'MyDiceLoss':
             loss = loss_function(preds, targets)
 
-            #print(loss)
             batch_loss = loss.detach().item()
-            #print(batch_loss)
-            #manager.track_loss(batch_loss)
+
             epoch_loss += batch_loss
-            # average_epoch_loss = epoch_loss / batch_count
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
             TP, FP, FN = calculate_my_sets(preds.detach(), targets.detach())
-            # print(TP, FP, FN)
-            # recall, precision, f1_score,  = calculate_my_metrics(TP, FP, FN)
-            # print(recall, precision, f1_score)
 
             epoch_tp += TP
             epoch_fp += FP
@@ -160,11 +135,6 @@ for run in RunBuilder.get_runs(params):
         # torch.cuda.empty_cache()
         test_count = 0
         test_epoch_loss = 0
-        #t_epoch_recall = 0
-        # t_epoch_true_negative_rate = 0
-        #t_epoch_precision = 0
-        # t_epoch_accuracy = 0
-        #t_epoch_f1_score = 0
 
         test_epoch_tp = 0
         test_epoch_fp = 0
@@ -196,25 +166,11 @@ for run in RunBuilder.get_runs(params):
             test_loss = loss_function(preds.detach(), targets.detach())
             test_epoch_loss += test_loss.item()
 
-            # t_recall, t_precision, t_f1_score = calculate_my_metrics(preds.detach(), targets.detach())
-            # t_epoch_recall += t_recall
-            # # t_epoch_true_negative_rate += t_true_negative_rate
-            # t_epoch_precision += t_precision
-            # # t_epoch_accuracy += t_accuracy
-            # t_epoch_f1_score += t_f1_score
             test_TP, test_FP, test_FN = calculate_my_sets(preds.detach(), targets.detach())
 
             test_epoch_tp += test_TP
             test_epoch_fp += test_FP
             test_epoch_fn += test_FN
-#             # if test_batch % 1 == 0:
-#             #     with open(save_file_new_2, 'a', newline='') as f:
-#             #         result = [runs_count, run.unet, run.loss, epoch, test_count, run.data, test_patient, str(test_slices),
-#             #                   run.lr, test_batch_size, round(test_loss.item(), 4),
-#             #                   round(test_batch_l1_loss, 4), test_batch_correct_teeth, test_batch_teeth_all]
-#             #
-#             #         writer = csv.writer(f)
-#             #         writer.writerow(result)
             torch.cuda.empty_cache()
             del targets
 
@@ -227,12 +183,12 @@ for run in RunBuilder.get_runs(params):
         # manager.track_test_num_correct(t_epoch_recall, t_epoch_precision, t_epoch_f1_score)
         manager.track_test_true_epoch_metrics(epoch_test_recall, epoch_test_precision, epoch_test_f1_score)
 
-        if epoch_test_f1_score > my_f1_score:
-            my_f1_score = epoch_test_f1_score
-            print('model now save, epoch =', epoch)
-            print('epoch_test_f1_score:', epoch_test_f1_score)
-            torch.save(network, my_save_path + '\\' + '3d_network_260_epoch_own_scale_200_clamp.pth')
-        # scheduler.step()
+        # if epoch_test_f1_score > my_f1_score:
+        #     my_f1_score = epoch_test_f1_score
+        #     print('model now save, epoch =', epoch)
+        #     print('epoch_test_f1_score:', epoch_test_f1_score)
+        #     torch.save(network, my_save_path + '\\' + '3d_network_260_epoch_own_scale_200_clamp.pth')
+        # # scheduler.step()
         if epoch % 5 == 0:
             checkpoint = {'state_dict': network.state_dict(), 'optimizer': optimizer.state_dict(), 'Epoch': epoch, 'F1_score': my_f1_score}
             save_checkpoint(checkpoint)
