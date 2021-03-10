@@ -49,13 +49,13 @@ params = OrderedDict(unet=['Unet3D'], loss=['MyDiceBCELoss'], lr=[0.00008], scal
 device = torch.device(card)
 manager = RunManager3D()
 runs_count = 0
-np.random.seed(2020)
-number_of_batches = 189
+np.random.seed(2021)
+number_of_batches = 252
 test_batches_number = int(np.floor(number_of_batches / 5))
 ss = np.random.permutation(number_of_batches) + 1
-#test_batches = ss[:test_batches_number]
+test_batches = ss[:test_batches_number]
 train_batches = ss[test_batches_number:]
-test_batches = range(190, 211)  # (211, 232)  tai (232, 253)  .. uusille seteille
+# test_batches = range(190, 211)  # (211, 232)  tai (232, 253)  .. uusille seteille
 
 for run in RunBuilder.get_runs(params):
     runs_count += 1
